@@ -18,6 +18,7 @@ class bCore:
         self.itemsES=[]
         self.itemsEN=[]
         # Lista de diccionarios
+        #
         # 'itemES' 'itemEN' 'pos'
         self.elementos=[]
         self.anio=-1

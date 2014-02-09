@@ -37,6 +37,12 @@ class bCore:
     def cargaBoletines(self,nombre):
 
         del self.elementos[:]
+        del self.itemsES[:]
+        del self.itemsEN[:]
+        self.posNot=0
+        self.posDoc=0
+        self.posEve=0
+        self.posRef=0
         path=self.parametros.dirxml
         self.nombreEs=os.path.join(path,nombre+'.xml')
         self.nombreEn=os.path.join(path,nombre+'-en.xml')

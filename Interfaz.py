@@ -30,7 +30,12 @@ class Interfaz(Frame):
         self.reflexiones=[]
 
         self.core=bCore(parametros)
-        self.initUI(self.parametros.version)
+        self.titulo="Gesbol "+self.parametros.version
+        self.initUI(self.titulo)
+
+    def setFileTitulo(self,file):
+        self.parent.title(self.titulo+' - '+file)
+
         #OjO
         #self.HerrCopiara()
         #self.editUI()
@@ -41,7 +46,7 @@ class Interfaz(Frame):
         Ventana Inicial. Establece título y menú
         """
         self.parent.geometry("260x250")
-        self.parent.title("Gesbol "+version)
+        self.parent.title(self.titulo)
 
         MenuBar=Menu(self.parent)
         self.parent.config(menu=MenuBar)
@@ -218,7 +223,9 @@ class Interfaz(Frame):
         ButCancel.grid(row=1,column=2)
         ButCancel.configure(command=self.formNuevoBoletinSalir)
 
-        self.NuevoBoletinFrame1.pack(side=LEFT)
+        self.setFileTitulo("boletin-"+self.Id)
+
+        self.NuevoBoletinFrame1.grid()
 
     def formNuevoBoletinSalir(self):
         """
@@ -287,6 +294,7 @@ class Interfaz(Frame):
         """
         # OjO descomentar
         self.core.cargaBoletines(nombre)
+        self.setFileTitulo(nombre)
         self.listaItems()
         self.HideListaArchivos()
         self.editUI()
@@ -478,7 +486,7 @@ class Interfaz(Frame):
         L1.grid(row=0,column=0,sticky=W)
         scrollbar1=Scrollbar(itemsFrame)
         scrollbar1.grid(row=1,column=1,sticky=N+S)
-        self.ListBoxNoticias=Listbox(itemsFrame,yscrollcommand=scrollbar1.set,selectmode=MULTIPLE)
+        self.ListBoxNoticias=Listbox(itemsFrame,yscrollcommand=scrollbar1.set,selectmode=MULTIPLE,exportselection=False)
         self.ListBoxNoticias.grid(row=1,column=0)
         for item in self.noticias:
             self.ListBoxNoticias.insert(END, item)
@@ -487,7 +495,7 @@ class Interfaz(Frame):
         L2.grid(row=2,column=0,sticky=W)
         scrollbar2=Scrollbar(itemsFrame)
         scrollbar2.grid(row=3,column=1,sticky=N+S)
-        self.ListBoxEventos=Listbox(itemsFrame,yscrollcommand=scrollbar2.set,selectmode=MULTIPLE)
+        self.ListBoxEventos=Listbox(itemsFrame,yscrollcommand=scrollbar2.set,selectmode=MULTIPLE,exportselection=False)
         self.ListBoxEventos.grid(row=3,column=0)
         for item in self.eventos:
             self.ListBoxEventos.insert(END, item)
@@ -496,7 +504,7 @@ class Interfaz(Frame):
         L3.grid(row=4,column=0,sticky=W)
         scrollbar3=Scrollbar(itemsFrame)
         scrollbar3.grid(row=5,column=1,sticky=N+S)
-        self.ListBoxDocumentos=Listbox(itemsFrame,yscrollcommand=scrollbar3.set,selectmode=MULTIPLE,height=5)
+        self.ListBoxDocumentos=Listbox(itemsFrame,yscrollcommand=scrollbar3.set,selectmode=MULTIPLE,height=5,exportselection=False)
         self.ListBoxDocumentos.grid(row=5,column=0)
         for item in self.eventos:
             self.ListBoxDocumentos.insert(END, item)
@@ -505,7 +513,7 @@ class Interfaz(Frame):
         L4.grid(row=6,column=0,sticky=W)
         scrollbar4=Scrollbar(itemsFrame)
         scrollbar4.grid(row=7,column=1,sticky=N+S)
-        self.ListBoxReflexiones=Listbox(itemsFrame,yscrollcommand=scrollbar4.set,selectmode=MULTIPLE,height=5)
+        self.ListBoxReflexiones=Listbox(itemsFrame,yscrollcommand=scrollbar4.set,selectmode=MULTIPLE,height=5,exportselection=False)
         self.ListBoxReflexiones.grid(row=7,column=0)
         for item in self.reflexiones:
             self.ListBoxReflexiones.insert(END, item)
@@ -515,9 +523,9 @@ class Interfaz(Frame):
         ButSend.grid(row=0,column=0)
         ButSend.configure(command=self.DoCopiara)
 
-        ButTerminar=Button(BotonFrame,text="Terminar")
-        ButTerminar.grid(row=1,column=0)
-        ButTerminar.configure(command=self.DoTerminar)
+        # ButTerminar=Button(BotonFrame,text="Terminar")
+        # ButTerminar.grid(row=1,column=0)
+        # ButTerminar.configure(command=self.DoTerminar)
 
         ArchFrame=Frame(CopiarFrame,width=400,height=altura)
 
@@ -537,7 +545,57 @@ class Interfaz(Frame):
         self.FrameActiva=CopiarFrame
 
     def DoCopiara(self):
-        pass
+
+        l=self.ListaArchivos()
+        i=int(self.ListBoxArchivos.curselection()[0])
+        boletin=l[i]
+
+        tits=[]
+        n=self.ListBoxNoticias.curselection()
+        for i in n:
+            tits.append(self.noticias[int(i)])
+        n=self.ListBoxDocumentos.curselection()
+        for i in n:
+            tits.append(self.documentos[int(i)])
+        n=self.ListBoxEventos.curselection()
+        for i in n:
+            tits.append(self.eventos[int(i)])
+        n=self.ListBoxReflexiones.curselection()
+        for i in n:
+            tits.append(self.reflexiones[int(i)])
+        ns=[]
+        for i in tits:
+            ns.append(self.numByTit(i))
+
+        elementos=[]
+        for i in ns:
+            elementos.append(self.core.elementos[i])
+
+        self.AbrirBoletin(boletin)
+
+        for i in elementos:
+            en={}
+            en['titulo']=i['itemEN'].findtext('titulo')
+            en['texto']=i['itemEN'].findtext('texto')
+            en['link']=i['itemEN'].findtext('link')
+            en['tipo']=i['itemEN'].findtext('tipo')
+            en['tag']=i['itemEN'].findtext('tag')
+            es={}
+            es['titulo']=i['itemES'].find('titulo').text
+            es['texto']=i['itemES'].find('texto').text
+            es['link']=i['itemES'].find('link').text
+            es['tipo']=i['itemES'].find('tipo').text
+            es['tag']=i['itemES'].find('tag').text
+            self.core.nuevoItem(en,es)
+        self.listaItems()
+        pos=self.setPosiciones()
+        self.core.updateFiles(pos)
+
+        self.ListBoxNot.fill(self.noticias)
+        self.ListBoxDoc.fill(self.documentos)
+        self.ListBoxEve.fill(self.eventos)
+        self.ListBoxRef.fill(self.reflexiones)
+
 
     def DoTerminar(self):
         pass

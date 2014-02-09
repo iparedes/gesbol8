@@ -32,6 +32,7 @@ class Interfaz(Frame):
         self.core=bCore(parametros)
         self.initUI(self.parametros.version)
         #OjO
+        #self.HerrCopiara()
         #self.editUI()
         #self.formNuevoBoletin()
 
@@ -49,6 +50,10 @@ class Interfaz(Frame):
         FileMenu.add_command(label="Nuevo",command=self.ArchivoNuevo)
         FileMenu.add_command(label="Abrir",command=self.ArchivoAbrir)
         MenuBar.add_cascade(label="Archivo",menu=FileMenu)
+        self.HerrMenu=Menu(MenuBar,tearoff=0)
+        self.HerrMenu.add_command(label="Copiar a",command=self.HerrCopiara)
+        MenuBar.add_cascade(label="Herramientas",menu=self.HerrMenu)
+        self.HerrMenu.entryconfigure(0,state=DISABLED)
         self.pack(fill=BOTH, expand=1)
 
     def editUI(self):
@@ -256,6 +261,7 @@ class Interfaz(Frame):
         self.ButOKAbrirArchivo.grid(row=0,column=2)
 
         self.ArchivoAbrirFrame.grid()
+        self.HerrMenu.entryconfigure(0,state='normal')
 
     def HideListaArchivos(self):
         """
@@ -459,3 +465,79 @@ class Interfaz(Frame):
         titulo=self.eventos[i]
         item=self.core.item(titulo)
         self.puebla_item(item[0],item[1],item[2])
+
+    def HerrCopiara(self):
+        self.borra()
+        altura=650
+        self.parent.geometry("500x650")
+        CopiarFrame=Frame(self, width=840, height=altura)
+
+        itemsFrame=Frame(CopiarFrame,width=440,height=altura)
+
+        L1=Label(itemsFrame,text="Noticias")
+        L1.grid(row=0,column=0,sticky=W)
+        scrollbar1=Scrollbar(itemsFrame)
+        scrollbar1.grid(row=1,column=1,sticky=N+S)
+        self.ListBoxNoticias=Listbox(itemsFrame,yscrollcommand=scrollbar1.set,selectmode=MULTIPLE)
+        self.ListBoxNoticias.grid(row=1,column=0)
+        for item in self.noticias:
+            self.ListBoxNoticias.insert(END, item)
+
+        L2=Label(itemsFrame,text="Eventos")
+        L2.grid(row=2,column=0,sticky=W)
+        scrollbar2=Scrollbar(itemsFrame)
+        scrollbar2.grid(row=3,column=1,sticky=N+S)
+        self.ListBoxEventos=Listbox(itemsFrame,yscrollcommand=scrollbar2.set,selectmode=MULTIPLE)
+        self.ListBoxEventos.grid(row=3,column=0)
+        for item in self.eventos:
+            self.ListBoxEventos.insert(END, item)
+
+        L3=Label(itemsFrame,text="Documentos")
+        L3.grid(row=4,column=0,sticky=W)
+        scrollbar3=Scrollbar(itemsFrame)
+        scrollbar3.grid(row=5,column=1,sticky=N+S)
+        self.ListBoxDocumentos=Listbox(itemsFrame,yscrollcommand=scrollbar3.set,selectmode=MULTIPLE,height=5)
+        self.ListBoxDocumentos.grid(row=5,column=0)
+        for item in self.eventos:
+            self.ListBoxDocumentos.insert(END, item)
+
+        L4=Label(itemsFrame,text="Reflexiones")
+        L4.grid(row=6,column=0,sticky=W)
+        scrollbar4=Scrollbar(itemsFrame)
+        scrollbar4.grid(row=7,column=1,sticky=N+S)
+        self.ListBoxReflexiones=Listbox(itemsFrame,yscrollcommand=scrollbar4.set,selectmode=MULTIPLE,height=5)
+        self.ListBoxReflexiones.grid(row=7,column=0)
+        for item in self.reflexiones:
+            self.ListBoxReflexiones.insert(END, item)
+
+        BotonFrame=Frame(CopiarFrame,width=100,height=altura)
+        ButSend=Button(BotonFrame,text=">")
+        ButSend.grid(row=0,column=0)
+        ButSend.configure(command=self.DoCopiara)
+
+        ButTerminar=Button(BotonFrame,text="Terminar")
+        ButTerminar.grid(row=1,column=0)
+        ButTerminar.configure(command=self.DoTerminar)
+
+        ArchFrame=Frame(CopiarFrame,width=400,height=altura)
+
+        scrollbar5=Scrollbar(ArchFrame)
+        scrollbar5.grid(row=0,column=1,sticky=N+S)
+        self.ListBoxArchivos=Listbox(ArchFrame,yscrollcommand=scrollbar5.set)
+        self.ListBoxArchivos.grid(row=0,column=0)
+
+        l=self.ListaArchivos()
+        for i in l:
+            self.ListBoxArchivos.insert(END,i)
+
+        itemsFrame.grid(row=0,column=0)
+        BotonFrame.grid(row=0,column=1)
+        ArchFrame.grid(row=0,column=2)
+        CopiarFrame.grid()
+        self.FrameActiva=CopiarFrame
+
+    def DoCopiara(self):
+        pass
+
+    def DoTerminar(self):
+        pass

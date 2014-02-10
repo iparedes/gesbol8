@@ -459,3 +459,9 @@ class Interfaz(Frame):
         titulo=self.eventos[i]
         item=self.core.item(titulo)
         self.puebla_item(item[0],item[1],item[2])
+
+    def funciondeprueba(self):
+        """
+        Esto es posterior a la version 1
+        """
+        pass

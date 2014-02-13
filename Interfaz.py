@@ -598,4 +598,7 @@ class Interfaz(Frame):
 
 
     def DoTerminar(self):
+	"""
+	test
+	"""
         pass

@@ -223,7 +223,7 @@ class Interfaz(Frame):
         ButCancel.grid(row=1,column=2)
         ButCancel.configure(command=self.formNuevoBoletinSalir)
 
-        self.setFileTitulo("boletin-"+self.Id)
+        self.setFileTitulo("boletin-"+str(self.Id))
 
         self.NuevoBoletinFrame1.grid()
 
@@ -323,7 +323,7 @@ class Interfaz(Frame):
             if tipo=='noticia':
                 noti.append({'titulo':titulo,'pos':pos})
             elif tipo=='documento':
-                docus.append({'titulo':titulo,'pos':pos})
+                docu.append({'titulo':titulo,'pos':pos})
             elif tipo=='evento':
                 even.append({'titulo':titulo,'pos':pos})
             else:

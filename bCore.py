@@ -57,7 +57,7 @@ class bCore:
         self.itemsEN=self.xmlDataEn.findall("//item")
 
         for es,en in zip(self.itemsES,self.itemsEN):
-            self.appendItem(es,en)
+            self.appendItem(en,es)
 
         fecha=self.xmlDataEn.findtext('fecha')
         e=re.match('(.+) (\d+)\, (\d+)',fecha,re.M|re.I)

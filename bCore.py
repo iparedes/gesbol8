@@ -18,6 +18,7 @@ class bCore:
         self.itemsES=[]
         self.itemsEN=[]
         # Lista de diccionarios
+        #
         # 'itemES' 'itemEN' 'pos'
         self.elementos=[]
         self.anio=-1
@@ -36,6 +37,12 @@ class bCore:
     def cargaBoletines(self,nombre):
 
         del self.elementos[:]
+        del self.itemsES[:]
+        del self.itemsEN[:]
+        self.posNot=0
+        self.posDoc=0
+        self.posEve=0
+        self.posRef=0
         path=self.parametros.dirxml
         self.nombreEs=os.path.join(path,nombre+'.xml')
         self.nombreEn=os.path.join(path,nombre+'-en.xml')
@@ -50,7 +57,7 @@ class bCore:
         self.itemsEN=self.xmlDataEn.findall("//item")
 
         for es,en in zip(self.itemsES,self.itemsEN):
-            self.appendItem(es,en)
+            self.appendItem(en,es)
 
         fecha=self.xmlDataEn.findtext('fecha')
         e=re.match('(.+) (\d+)\, (\d+)',fecha,re.M|re.I)
@@ -226,31 +233,7 @@ class bCore:
             item.find('titulo').text=itemES['titulo']
             item.find('tag').text=itemES['tag']
             item.find('link').text=itemES['link']
-            
-        # numbuscado=itemEN['num']
-        # #items=self.xmlDataEn.findall("//item")
-        # for item in self.itemsEN:
-        #     num=item.findtext("num")
-        #     if (num==numbuscado):
-        #         item.find('tipo').text=itemEN['tipo']
-        #         item.find('num').text=itemEN['num']
-        #         item.find('texto').text=itemEN['texto']
-        #         if (itemEN['tipo']<>"reflexion"):
-        #             item.find('titulo').text=itemEN['titulo']
-        #             item.find('tag').text=itemEN['tag']
-        #             item.find('link').text=itemEN['link']
-        #         break
-        # for item in self.itemsES:
-        #     num=item.findtext("num")
-        #     if (num==numbuscado):
-        #         item.find('tipo').text=itemES['tipo']
-        #         item.find('num').text=itemES['num']
-        #         item.find('texto').text=itemES['texto']
-        #         if (itemES['tipo']<>"reflexion"):
-        #             item.find('link').text=itemES['link']
-        #             item.find('tag').text=itemES['tag']
-        #             item.find('titulo').text=itemES['titulo']
-        #         break
+
 
 
     def updateFiles(self,posiciones):
@@ -332,6 +315,7 @@ class bCore:
         i={}
 
         path=self.parametros.dirconf
+        pathhtml=self.parametros.dirhtml
         d=date(int(self.anio),int(self.mes),int(self.dia))
         filedate=d.strftime('%Y%m%d')
 
@@ -340,13 +324,15 @@ class bCore:
             self.plantilla=os.path.join(path,self.parametros.plantillaen)
             self.fecha=self.xmlDataEn.findtext('fecha')
             self.id=self.xmlDataEn.findtext('id')
-            self.output="Boletin-"+filedate+"-en.html"
+            nombre="Boletin-"+filedate+"-en.html"
+            self.output=os.path.join(pathhtml,nombre)
         else:
             self.tag_enlace="Enlace"
             self.plantilla=os.path.join(path,self.parametros.plantillaes)
             self.fecha=self.xmlDataEs.findtext('fecha')
             self.id=self.xmlDataEs.findtext('id')
-            self.output="Boletin-"+filedate+".html"
+            nombre="Boletin-"+filedate+".html"
+            self.output=os.path.join(pathhtml,nombre)
 
         for o in self.elementos:
             if idioma=='EN':

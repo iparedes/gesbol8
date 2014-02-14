@@ -18,6 +18,9 @@ develop-eggs
 lib
 lib64
 __pycache__
+boletines-xml/
+*.xml
+*.html
 
 # Installer logs
 pip-log.txt
@@ -26,6 +29,7 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
+
 
 # Translations
 *.mo

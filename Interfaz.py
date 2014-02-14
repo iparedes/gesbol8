@@ -286,6 +286,7 @@ class Interfaz(Frame):
         for a in archs:
             e=re.match('.*\/(.*)\-en\.xml',a,re.M|re.I)
             l.append(e.group(1))
+        l.sort(key=self.natural_keys)
         return l
 
     def AbrirBoletin(self,nombre):
@@ -596,6 +597,16 @@ class Interfaz(Frame):
         self.ListBoxEve.fill(self.eventos)
         self.ListBoxRef.fill(self.reflexiones)
 
+    def atoi(self,text):
+        return int(text) if text.isdigit() else text
+
+    def natural_keys(self,text):
+        '''
+        alist.sort(key=natural_keys) sorts in human order
+        http://nedbatchelder.com/blog/200712/human_sorting.html
+        (See Toothy's implementation in the comments)
+        '''
+        return [ self.atoi(c) for c in re.split('(\d+)', text) ]
 
     def DoTerminar(self):
 	"""

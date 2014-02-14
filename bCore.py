@@ -223,7 +223,13 @@ class bCore:
         item.find('texto').text=itemEN['texto']
         if (itemEN['tipo']<>"reflexion"):
             item.find('titulo').text=itemEN['titulo']
-            item.find('tag').text=itemEN['tag']
+            t=item.find('tag')
+            if t==None:
+                ident=etree.SubElement(item,"pos")
+                ident.text=itemEN['tag']
+            else:
+                t.text=itemEN['tag']
+            #item.find('tag').text=itemEN['tag']
             item.find('link').text=itemEN['link']
         item=self.elementos[num]['itemES']
         item.find('tipo').text=itemES['tipo']
@@ -231,7 +237,13 @@ class bCore:
         item.find('texto').text=itemES['texto']
         if (itemES['tipo']<>"reflexion"):
             item.find('titulo').text=itemES['titulo']
-            item.find('tag').text=itemES['tag']
+            t=item.find('tag')
+            if t==None:
+                ident=etree.SubElement(item,"pos")
+                ident.text=itemES['tag']
+            else:
+                t.text=itemES['tag']
+            #item.find('tag').text=itemES['tag']
             item.find('link').text=itemES['link']
 
 

@@ -328,10 +328,11 @@ class Interfaz(Frame):
             else:
                 refl.append({'titulo':titulo,'pos':pos})
 
-        self.noticias=[i['titulo'] for i in sorted(noti,key=lambda k: k['pos'])]
-        self.documentos=[i['titulo'] for i in sorted(docu,key=lambda k: k['pos'])]
-        self.eventos=[i['titulo'] for i in sorted(even,key=lambda k: k['pos'])]
-        self.reflexiones=[i['titulo'] for i in sorted(refl,key=lambda k: k['pos'])]
+        # OjO. Si se asignan las listas, la MyListBox pierde su referencia a elementos
+        self.noticias.extend([i['titulo'] for i in sorted(noti,key=lambda k: k['pos'])])
+        self.documentos.extend([i['titulo'] for i in sorted(docu,key=lambda k: k['pos'])])
+        self.eventos.extend([i['titulo'] for i in sorted(even,key=lambda k: k['pos'])])
+        self.reflexiones.extend([i['titulo'] for i in sorted(refl,key=lambda k: k['pos'])])
 
     def newItem(self):
         """

@@ -292,7 +292,6 @@ class Interfaz(Frame):
         """
         Callback desde Menu Archivo->Abrir.
         """
-        # OjO descomentar
         self.core.cargaBoletines(nombre)
         self.setFileTitulo(nombre)
         self.listaItems()
@@ -318,7 +317,7 @@ class Interfaz(Frame):
         for i in self.core.elementos:
             item=i['itemEN']
             titulo=item.findtext("titulo")
-            pos=item.findtext("pos")
+            pos=int(item.findtext("pos"))
             tipo=item.findtext("tipo")
             if tipo=='noticia':
                 noti.append({'titulo':titulo,'pos':pos})

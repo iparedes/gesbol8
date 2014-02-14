@@ -315,6 +315,7 @@ class bCore:
         i={}
 
         path=self.parametros.dirconf
+        pathhtml=self.parametros.dirhtml
         d=date(int(self.anio),int(self.mes),int(self.dia))
         filedate=d.strftime('%Y%m%d')
 
@@ -323,13 +324,15 @@ class bCore:
             self.plantilla=os.path.join(path,self.parametros.plantillaen)
             self.fecha=self.xmlDataEn.findtext('fecha')
             self.id=self.xmlDataEn.findtext('id')
-            self.output="Boletin-"+filedate+"-en.html"
+            nombre="Boletin-"+filedate+"-en.html"
+            self.output=os.path.join(pathhtml,nombre)
         else:
             self.tag_enlace="Enlace"
             self.plantilla=os.path.join(path,self.parametros.plantillaes)
             self.fecha=self.xmlDataEs.findtext('fecha')
             self.id=self.xmlDataEs.findtext('id')
-            self.output="Boletin-"+filedate+".html"
+            nombre="Boletin-"+filedate+".html"
+            self.output=os.path.join(pathhtml,nombre)
 
         for o in self.elementos:
             if idioma=='EN':

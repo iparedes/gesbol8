@@ -11,6 +11,7 @@ class ConfigManager():
         self.plantillaes=self.ConfigSectionMap("gesbol")['plantillaes']
         self.plantillaen=self.ConfigSectionMap("gesbol")['plantillaen']
         self.dirconf=self.ConfigSectionMap("gesbol")['dirconf']
+        self.dirhtml=self.ConfigSectionMap("gesbol")['dirhtml']
 
     def ConfigSectionMap(self,section):
         dict1 = {}

@@ -492,23 +492,23 @@ class Interfaz(Frame):
         for item in self.noticias:
             self.ListBoxNoticias.insert(END, item)
 
-        L2=Label(itemsFrame,text="Eventos")
-        L2.grid(row=2,column=0,sticky=W)
-        scrollbar2=Scrollbar(itemsFrame)
-        scrollbar2.grid(row=3,column=1,sticky=N+S)
-        self.ListBoxEventos=Listbox(itemsFrame,yscrollcommand=scrollbar2.set,selectmode=MULTIPLE,exportselection=False)
-        self.ListBoxEventos.grid(row=3,column=0)
-        for item in self.eventos:
-            self.ListBoxEventos.insert(END, item)
-
         L3=Label(itemsFrame,text="Documentos")
-        L3.grid(row=4,column=0,sticky=W)
+        L3.grid(row=2,column=0,sticky=W)
         scrollbar3=Scrollbar(itemsFrame)
-        scrollbar3.grid(row=5,column=1,sticky=N+S)
+        scrollbar3.grid(row=3,column=1,sticky=N+S)
         self.ListBoxDocumentos=Listbox(itemsFrame,yscrollcommand=scrollbar3.set,selectmode=MULTIPLE,height=5,exportselection=False)
-        self.ListBoxDocumentos.grid(row=5,column=0)
+        self.ListBoxDocumentos.grid(row=3,column=0)
         for item in self.eventos:
             self.ListBoxDocumentos.insert(END, item)
+
+        L2=Label(itemsFrame,text="Eventos")
+        L2.grid(row=4,column=0,sticky=W)
+        scrollbar2=Scrollbar(itemsFrame)
+        scrollbar2.grid(row=5,column=1,sticky=N+S)
+        self.ListBoxEventos=Listbox(itemsFrame,yscrollcommand=scrollbar2.set,selectmode=MULTIPLE,exportselection=False)
+        self.ListBoxEventos.grid(row=5,column=0)
+        for item in self.eventos:
+            self.ListBoxEventos.insert(END, item)
 
         L4=Label(itemsFrame,text="Reflexiones")
         L4.grid(row=6,column=0,sticky=W)

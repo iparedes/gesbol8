@@ -6,6 +6,7 @@ __author__ = 'nacho'
 
 import glob
 import os
+import re
 from MyListbox import MyListbox
 from Tkinter import *
 from bCore import bCore
@@ -32,14 +33,15 @@ class Interfaz(Frame):
         self.core=bCore(parametros)
         self.titulo="Gesbol "+self.parametros.version
         self.initUI(self.titulo)
-
-    def setFileTitulo(self,file):
-        self.parent.title(self.titulo+' - '+file)
-
         #OjO
         #self.HerrCopiara()
         #self.editUI()
         #self.formNuevoBoletin()
+
+
+    def setFileTitulo(self,file):
+        self.parent.title(self.titulo+' - '+file)
+
 
     def initUI(self,version):
         """
@@ -78,6 +80,18 @@ class Interfaz(Frame):
     def borra(self):
         if self.FrameActiva:
             self.FrameActiva.grid_forget()
+
+    def extrae_tags(self):
+        l=[]
+        #stags=[]
+        stags=self.core.tags.keys()
+        for i in sorted(stags):
+            if i<>'':
+                t=self.core.tags[i]
+                text=i+": "+str(t)
+                l.append(text)
+        return l
+
 
 
     def itemUI(self):
@@ -130,12 +144,25 @@ class Interfaz(Frame):
         self.Tags=Entry(self.itemFrame,textvariable=self.Tagsv,width=48)
         self.Tags.grid(row=13,column=0)
 
+        lista_tags=self.extrae_tags()
+
+        downFrame = Frame(self.itemFrame, width=480, height=50,background="yellow")
+        self.option_tagsv=StringVar()
+        self.option_tagsv.set("tags")
+        self.option_tag=OptionMenu(downFrame,self.option_tagsv,*lista_tags,command=self.update_tag)
+        #self.option_tag = apply(OptionMenu, (downFrame, self.option_tagsv) + tuple(lista_tags),self.update_tag)
+        self.option_tag.configure(width=30)
+        self.option_tag.grid(row=0,column=0,sticky=W)
+
+        L8=Label(downFrame,text="Tipo:")
+        L8.grid(row=0,column=1,sticky=E)
         self.Tipov=StringVar()
         self.Tipov.set("noticia")
-        self.Tipo=OptionMenu(self.itemFrame,self.Tipov,"noticia","documento","evento","reflexion")
-        self.Tipo.grid(row=14,column=0,sticky=W)
+        self.Tipo=OptionMenu(downFrame,self.Tipov,"noticia","documento","evento","reflexion")
+        self.Tipo.grid(row=0,column=2,sticky=E)
+        downFrame.grid(row=14,column=0,sticky=W+E)
 
-        self.butFrame = Frame(self.editItemFrame, width=100, height=585);
+        self.butFrame = Frame(self.editItemFrame, width=100, height=585)
         self.ButNew=Button(self.butFrame,text="Nuevo")
         self.ButNew.configure(command=self.newItem)
         self.ButNew.grid(row=0,column=0)
@@ -162,6 +189,14 @@ class Interfaz(Frame):
         self.butFrame.grid(row=0,column=1)
         self.listframe.grid(row=0,column=2)
 
+    def update_tag(self,e):
+        x=re.match('(.+)\:.+$',e,re.M|re.I)
+        t=x.group(1)
+        d=self.Tagsv.get()
+        if len(d)==0:
+            self.Tagsv.set(t)
+        else:
+            self.Tagsv.set(d+","+t)
 
     def puebla_item(self,itemEN,itemES,num):
         #LabelNum contiene el num del elemento cargado

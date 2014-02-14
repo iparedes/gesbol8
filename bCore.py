@@ -4,6 +4,7 @@ __author__ = 'nacho'
 
 import re
 import os
+import glob
 import shutil
 from lxml import etree
 from django.template import Template, Context
@@ -17,6 +18,7 @@ class bCore:
         # Almacenan los items importados del XML
         self.itemsES=[]
         self.itemsEN=[]
+
         # Lista de diccionarios
         #
         # 'itemES' 'itemEN' 'pos'
@@ -25,7 +27,8 @@ class bCore:
         self.dia=-1
         self.mes=-1
         self.parametros=parametros
-
+        coco=self.parametros.dirxml
+        self.tags=self.carga_tags()
         self.posNot=0
         self.posDoc=0
         self.posEve=0
@@ -33,6 +36,30 @@ class bCore:
 
         settings.configure()
 
+    def carga_tags(self):
+        dtags={}
+        #path=self.parametros.dirxml
+        #path='../../boletines-trabajo'
+        path=self.parametros.dirxml
+        for files in glob.glob(os.path.join(path,"*-en.xml")):
+                xmlData=etree.parse(files)
+                items=xmlData.findall("//item")
+
+                for item in items:
+                    listatags=item.findtext("tag")
+                    if listatags:
+                        # Separa por comas convierte a minusculas
+                        # y elimina espacios antes y despues de las comas
+                        tags=[x.strip().lower() for x in listatags.split(',')]
+                        for t in tags:
+                            if t in dtags.keys():
+                                dtags[t]+=1
+                            else:
+                                dtags[t]=1
+        return dtags
+        #self.tags=sorted(dtags, key=lambda i: int(dtags[i]),reverse=True)
+        # for elemento in orden:
+        #     print elemento,":",dtags[elemento]
 
     def cargaBoletines(self,nombre):
 
@@ -443,3 +470,4 @@ class bCore:
                         "texto" : texto,
                         "link" : link}, autoescape=False)
         return t.render(c)
+

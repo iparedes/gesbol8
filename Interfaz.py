@@ -132,11 +132,19 @@ class Interfaz(Frame):
         self.LinkES=Entry(self.itemFrame,textvariable=self.LinkESv,width=48)
         self.LinkES.grid(row=9,column=0)
 
+
         self.L5=Label(self.itemFrame,text="LinkEN")
         self.L5.grid(row=10,column=0,sticky=W)
         self.LinkENv=StringVar()
-        self.LinkEN=Entry(self.itemFrame,textvariable=self.LinkENv,width=48)
+        self.LinkEN=Entry(self.itemFrame,textvariable=self.LinkENv,width=48,state=DISABLED)
         self.LinkEN.grid(row=11,column=0)
+
+        self.Var_linklink = BooleanVar()
+        self.linklink = Checkbutton(self.itemFrame, text = u"\u260D", variable = self.Var_linklink, \
+                 onvalue = 1, offvalue = 0, height=2,command=self.trata_link, \
+                 width = 3)
+        self.Var_linklink.set(TRUE)
+        self.linklink.grid(row=11,column=1)
 
         self.L7=Label(self.itemFrame,text="Tags")
         self.L7.grid(row=12,column=0,sticky=W)
@@ -189,6 +197,16 @@ class Interfaz(Frame):
         self.butFrame.grid(row=0,column=1)
         self.listframe.grid(row=0,column=2)
 
+    def trata_link(self):
+        e=self.Var_linklink.get()
+        if (e):
+            # linklink activado
+            self.LinkEN.configure(state=DISABLED)
+        else:
+            # linklink desactivado
+            self.LinkEN.configure(state=NORMAL)
+
+
     def update_tag(self,e):
         x=re.match('(.+)\:.+$',e,re.M|re.I)
         t=x.group(1)
@@ -200,18 +218,28 @@ class Interfaz(Frame):
 
     def puebla_item(self,itemEN,itemES,num):
         #LabelNum contiene el num del elemento cargado
+        linkes=itemES.find('link').text
+        linken=itemEN.find('link').text
+
+        if (linkes==linken):
+            self.Var_linklink.set(1)
+            self.LinkEN.configure(state=DISABLED)
+        else:
+            self.Var_linklink.set(0)
+            self.LinkEN.configure(state=NORMAL)
+
         self.LabelNum=num
         self.TitENv.set(itemEN.find('titulo').text)
         self.TextEN.delete("1.0",END)
         self.TextEN.insert(END,itemEN.find('texto').text)
-        self.LinkENv.set(itemEN.find('link').text)
+        self.LinkENv.set(linken)
         self.Tagsv.set(itemEN.find('tag').text)
         self.Tipov.set(itemEN.find('tipo').text)
 
         self.TitESv.set(itemES.find('titulo').text)
         self.TextES.delete("1.0",END)
         self.TextES.insert(END,itemES.find('texto').text)
-        self.LinkESv.set(itemES.find('link').text)
+        self.LinkESv.set(linkes)
 
     def BorraEditUI(self):
         """
@@ -226,6 +254,8 @@ class Interfaz(Frame):
         self.LinkENv.set("")
         self.Tipov.set("noticia")
         self.Tagsv.set("")
+        self.Var_linklink.set(1)
+        self.LinkEN.configure(state=DISABLED)
 
 
     def ArchivoNuevo(self):
@@ -385,7 +415,10 @@ class Interfaz(Frame):
         """
         titulo=self.TitENv.get()
         texto=self.TextEN.get("1.0",END)
-        link=self.LinkENv.get()
+        if self.Var_linklink.get():
+            link=self.LinkESv.get()
+        else:
+            link=self.LinkENv.get()
         tag=self.Tagsv.get()
         tipo=self.Tipov.get()
 

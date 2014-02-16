@@ -48,14 +48,15 @@ class bCore:
                 for item in items:
                     listatags=item.findtext("tag")
                     if listatags:
-                        # Separa por comas convierte a minusculas
+                        # Separa por comas
                         # y elimina espacios antes y despues de las comas
-                        tags=[x.strip().lower() for x in listatags.split(',')]
+                        tags=[x.strip() for x in listatags.split(',')]
                         for t in tags:
-                            if t in dtags.keys():
-                                dtags[t]+=1
-                            else:
-                                dtags[t]=1
+                            if t:
+                                if t in dtags.keys():
+                                    dtags[t]+=1
+                                else:
+                                    dtags[t]=1
         return dtags
         #self.tags=sorted(dtags, key=lambda i: int(dtags[i]),reverse=True)
         # for elemento in orden:
@@ -273,6 +274,41 @@ class bCore:
             #item.find('tag').text=itemES['tag']
             item.find('link').text=itemES['link']
 
+    def ren_tag(self,vieja,nueva):
+        path=os.path.join(self.parametros.dirxml,"*.xml")
+        cuenta=0
+        for files in glob.glob(path):
+            et=etree.parse(files)
+
+            # fecha=et.findtext("fecha")
+            # numero=et.findtext("id")
+            # print fecha,"(",numero,")"
+            # print "-----------------------------------------"
+
+            for tags in et.findall('.//tag'):
+                # Separa por comas convierte a minusculas
+                # y elimina espacios antes y despues de las comas
+                cadtags=tags.text
+                tags2=[]
+                # print cadtags
+                if (cadtags and (cadtags.lower() != 'none')):
+                    #print cadtags
+                    #listatags=[x.strip().lower() for x in cadtags.split(',')]
+                    listatags=[x.strip() for x in cadtags.split(',')]
+                    # tags son las etiquetas del item
+                    #tags2=[nueva if x==vieja else x for x in listatags]
+                    for x in listatags:
+                        if x==vieja:
+                            tags2.append(nueva)
+                            cuenta+=1
+                        else:
+                            tags2.append(x)
+                    listatags2=",".join(tags2)
+                    tags.text=listatags2
+            #OjO con los paths
+            et.write(files)
+        self.tags=self.carga_tags()
+        return cuenta
 
 
     def updateFiles(self,posiciones):

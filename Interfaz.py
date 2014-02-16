@@ -59,6 +59,7 @@ class Interfaz(Frame):
         MenuBar.add_cascade(label="Archivo",menu=FileMenu)
         self.HerrMenu=Menu(MenuBar,tearoff=0)
         self.HerrMenu.add_command(label="Copiar a",command=self.HerrCopiara)
+        self.HerrMenu.add_command(label="Renombrar tag",command=self.ren_tag)
         MenuBar.add_cascade(label="Herramientas",menu=self.HerrMenu)
         self.HerrMenu.entryconfigure(0,state=DISABLED)
         self.pack(fill=BOTH, expand=1)
@@ -85,7 +86,7 @@ class Interfaz(Frame):
         l=[]
         #stags=[]
         stags=self.core.tags.keys()
-        for i in sorted(stags):
+        for i in sorted(stags,key=lambda s: s.lower()):
             if i<>'':
                 t=self.core.tags[i]
                 text=i+": "+str(t)
@@ -542,6 +543,45 @@ class Interfaz(Frame):
         titulo=self.eventos[i]
         item=self.core.item(titulo)
         self.puebla_item(item[0],item[1],item[2])
+
+    def ren_tag(self):
+        self.borra()
+        self.parent.geometry("300x300")
+        self.ren_tagFrame=Frame(self,width=300,height=300)
+
+        lista_tags=sorted(self.core.tags.keys(),key=lambda s: s.lower())
+
+        L1=Label(self.ren_tagFrame,text="Tag vieja")
+        self.tag_vieja_var = StringVar()
+        self.tag_vieja_var.set(lista_tags[0])
+        self.tag_vieja_optionmenu=OptionMenu(self.ren_tagFrame,self.tag_vieja_var,*lista_tags)
+        self.tag_vieja_optionmenu.configure(width=30)
+        L2=Label(self.ren_tagFrame,text="Tag nueva")
+        self.tag_nueva_var=StringVar()
+        self.tag_nueva_entry=Entry(self.ren_tagFrame,textvariable=self.tag_nueva_var)
+        self.tag_nueva_ok=Button(self.ren_tagFrame,text="OK",command=self.do_ren_tag)
+
+        L1.grid(row=0)
+        self.tag_vieja_optionmenu.grid(row=1)
+        L2.grid(row=2)
+        self.tag_nueva_entry.grid(row=3)
+        self.tag_nueva_ok.grid(row=4)
+        self.ren_tagFrame.grid(row=0)
+        self.FrameActiva=self.ren_tagFrame
+
+    def do_ren_tag(self):
+        if self.tag_nueva_var.get():
+            n=self.core.ren_tag(self.tag_vieja_var.get(),self.tag_nueva_var.get())
+            lista_tags=sorted(self.core.tags.keys(),key=lambda s: s.lower())
+            m = self.tag_vieja_optionmenu.children['menu']
+            m.delete(0,END)
+            for val in lista_tags:
+                m.add_command(label=val,command=lambda v=self.tag_vieja_var,l=val:v.set(l))
+                self.tag_vieja_var.set(lista_tags[0])
+            self.tag_nueva_var.set('')
+        else:
+            # Si nueva es vacía podríamos borrar
+            pass
 
     def HerrCopiara(self):
         self.borra()

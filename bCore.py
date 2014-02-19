@@ -115,7 +115,7 @@ class bCore:
         else: # tipo=='reflexion'
             pos=self.posRef
             self.posRef+=1
-            en.find('titulo').text="Reflexion "+str(self.posRef)
+            en.find('titulo').text="Reflexion "+str(pos)
 
         posi=es.findtext('pos')
         if (posi==None):

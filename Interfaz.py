@@ -717,7 +717,4 @@ class Interfaz(Frame):
         return [ self.atoi(c) for c in re.split('(\d+)', text) ]
 
     def DoTerminar(self):
-	"""
-	test
-	"""
         pass

@@ -317,15 +317,16 @@ class bCore:
         Incorpora el campo pos a cada elemento
         """
         path=self.parametros.dirxml
+        pathbkp=self.parametros.dirbkp
         nombre="boletin"+self.id
         self.nombreEs=os.path.join(path,nombre+'.xml')
 
         nombreorig=os.path.join(path,nombre+'.xml')
-        nombredest=os.path.join(path,nombre+'.bak')
+        nombredest=os.path.join(pathbkp,nombre+'.bak')
         shutil.copy(nombreorig,nombredest)
 
         nombreorig=os.path.join(path,nombre+'-en.xml')
-        nombredest=os.path.join(path,nombre+'-en.bak')
+        nombredest=os.path.join(pathbkp,nombre+'-en.bak')
         shutil.copy(nombreorig,nombredest)
 
         copia_pos=list(posiciones)

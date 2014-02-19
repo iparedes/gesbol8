@@ -4,6 +4,7 @@ __author__ = 'nacho'
 
 import re
 import os
+import glob
 import shutil
 from lxml import etree
 from django.template import Template, Context
@@ -17,6 +18,7 @@ class bCore:
         # Almacenan los items importados del XML
         self.itemsES=[]
         self.itemsEN=[]
+
         # Lista de diccionarios
         #
         # 'itemES' 'itemEN' 'pos'
@@ -25,7 +27,8 @@ class bCore:
         self.dia=-1
         self.mes=-1
         self.parametros=parametros
-
+        coco=self.parametros.dirxml
+        self.tags=self.carga_tags()
         self.posNot=0
         self.posDoc=0
         self.posEve=0
@@ -33,6 +36,31 @@ class bCore:
 
         settings.configure()
 
+    def carga_tags(self):
+        dtags={}
+        #path=self.parametros.dirxml
+        #path='../../boletines-trabajo'
+        path=self.parametros.dirxml
+        for files in glob.glob(os.path.join(path,"*-en.xml")):
+                xmlData=etree.parse(files)
+                items=xmlData.findall("//item")
+
+                for item in items:
+                    listatags=item.findtext("tag")
+                    if listatags:
+                        # Separa por comas
+                        # y elimina espacios antes y despues de las comas
+                        tags=[x.strip() for x in listatags.split(',')]
+                        for t in tags:
+                            if t:
+                                if t in dtags.keys():
+                                    dtags[t]+=1
+                                else:
+                                    dtags[t]=1
+        return dtags
+        #self.tags=sorted(dtags, key=lambda i: int(dtags[i]),reverse=True)
+        # for elemento in orden:
+        #     print elemento,":",dtags[elemento]
 
     def cargaBoletines(self,nombre):
 
@@ -223,7 +251,13 @@ class bCore:
         item.find('texto').text=itemEN['texto']
         if (itemEN['tipo']<>"reflexion"):
             item.find('titulo').text=itemEN['titulo']
-            item.find('tag').text=itemEN['tag']
+            t=item.find('tag')
+            if t==None:
+                ident=etree.SubElement(item,"pos")
+                ident.text=itemEN['tag']
+            else:
+                t.text=itemEN['tag']
+            #item.find('tag').text=itemEN['tag']
             item.find('link').text=itemEN['link']
         item=self.elementos[num]['itemES']
         item.find('tipo').text=itemES['tipo']
@@ -231,9 +265,50 @@ class bCore:
         item.find('texto').text=itemES['texto']
         if (itemES['tipo']<>"reflexion"):
             item.find('titulo').text=itemES['titulo']
-            item.find('tag').text=itemES['tag']
+            t=item.find('tag')
+            if t==None:
+                ident=etree.SubElement(item,"pos")
+                ident.text=itemES['tag']
+            else:
+                t.text=itemES['tag']
+            #item.find('tag').text=itemES['tag']
             item.find('link').text=itemES['link']
 
+    def ren_tag(self,vieja,nueva):
+        path=os.path.join(self.parametros.dirxml,"*.xml")
+        cuenta=0
+        for files in glob.glob(path):
+            et=etree.parse(files)
+
+            # fecha=et.findtext("fecha")
+            # numero=et.findtext("id")
+            # print fecha,"(",numero,")"
+            # print "-----------------------------------------"
+
+            for tags in et.findall('.//tag'):
+                # Separa por comas convierte a minusculas
+                # y elimina espacios antes y despues de las comas
+                cadtags=tags.text
+                tags2=[]
+                # print cadtags
+                if (cadtags and (cadtags.lower() != 'none')):
+                    #print cadtags
+                    #listatags=[x.strip().lower() for x in cadtags.split(',')]
+                    listatags=[x.strip() for x in cadtags.split(',')]
+                    # tags son las etiquetas del item
+                    #tags2=[nueva if x==vieja else x for x in listatags]
+                    for x in listatags:
+                        if x==vieja:
+                            tags2.append(nueva)
+                            cuenta+=1
+                        else:
+                            tags2.append(x)
+                    listatags2=",".join(tags2)
+                    tags.text=listatags2
+            #OjO con los paths
+            et.write(files)
+        self.tags=self.carga_tags()
+        return cuenta
 
 
     def updateFiles(self,posiciones):
@@ -431,3 +506,4 @@ class bCore:
                         "texto" : texto,
                         "link" : link}, autoescape=False)
         return t.render(c)
+

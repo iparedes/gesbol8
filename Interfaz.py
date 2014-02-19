@@ -6,6 +6,7 @@ __author__ = 'nacho'
 
 import glob
 import os
+import re
 from MyListbox import MyListbox
 from Tkinter import *
 from bCore import bCore
@@ -32,14 +33,15 @@ class Interfaz(Frame):
         self.core=bCore(parametros)
         self.titulo="Gesbol "+self.parametros.version
         self.initUI(self.titulo)
-
-    def setFileTitulo(self,file):
-        self.parent.title(self.titulo+' - '+file)
-
         #OjO
         #self.HerrCopiara()
         #self.editUI()
         #self.formNuevoBoletin()
+
+
+    def setFileTitulo(self,file):
+        self.parent.title(self.titulo+' - '+file)
+
 
     def initUI(self,version):
         """
@@ -57,6 +59,7 @@ class Interfaz(Frame):
         MenuBar.add_cascade(label="Archivo",menu=FileMenu)
         self.HerrMenu=Menu(MenuBar,tearoff=0)
         self.HerrMenu.add_command(label="Copiar a",command=self.HerrCopiara)
+        self.HerrMenu.add_command(label="Renombrar tag",command=self.ren_tag)
         MenuBar.add_cascade(label="Herramientas",menu=self.HerrMenu)
         self.HerrMenu.entryconfigure(0,state=DISABLED)
         self.pack(fill=BOTH, expand=1)
@@ -78,6 +81,18 @@ class Interfaz(Frame):
     def borra(self):
         if self.FrameActiva:
             self.FrameActiva.grid_forget()
+
+    def extrae_tags(self):
+        l=[]
+        #stags=[]
+        stags=self.core.tags.keys()
+        for i in sorted(stags,key=lambda s: s.lower()):
+            if i<>'':
+                t=self.core.tags[i]
+                text=i+": "+str(t)
+                l.append(text)
+        return l
+
 
 
     def itemUI(self):
@@ -118,11 +133,19 @@ class Interfaz(Frame):
         self.LinkES=Entry(self.itemFrame,textvariable=self.LinkESv,width=48)
         self.LinkES.grid(row=9,column=0)
 
+
         self.L5=Label(self.itemFrame,text="LinkEN")
         self.L5.grid(row=10,column=0,sticky=W)
         self.LinkENv=StringVar()
-        self.LinkEN=Entry(self.itemFrame,textvariable=self.LinkENv,width=48)
+        self.LinkEN=Entry(self.itemFrame,textvariable=self.LinkENv,width=48,state=DISABLED)
         self.LinkEN.grid(row=11,column=0)
+
+        self.Var_linklink = BooleanVar()
+        self.linklink = Checkbutton(self.itemFrame, text = u"\u260D", variable = self.Var_linklink, \
+                 onvalue = 1, offvalue = 0, height=2,command=self.trata_link, \
+                 width = 3)
+        self.Var_linklink.set(TRUE)
+        self.linklink.grid(row=11,column=1)
 
         self.L7=Label(self.itemFrame,text="Tags")
         self.L7.grid(row=12,column=0,sticky=W)
@@ -130,12 +153,25 @@ class Interfaz(Frame):
         self.Tags=Entry(self.itemFrame,textvariable=self.Tagsv,width=48)
         self.Tags.grid(row=13,column=0)
 
+        lista_tags=self.extrae_tags()
+
+        downFrame = Frame(self.itemFrame, width=480, height=50,background="yellow")
+        self.option_tagsv=StringVar()
+        self.option_tagsv.set("tags")
+        self.option_tag=OptionMenu(downFrame,self.option_tagsv,*lista_tags,command=self.update_tag)
+        #self.option_tag = apply(OptionMenu, (downFrame, self.option_tagsv) + tuple(lista_tags),self.update_tag)
+        self.option_tag.configure(width=30)
+        self.option_tag.grid(row=0,column=0,sticky=W)
+
+        L8=Label(downFrame,text="Tipo:")
+        L8.grid(row=0,column=1,sticky=E)
         self.Tipov=StringVar()
         self.Tipov.set("noticia")
-        self.Tipo=OptionMenu(self.itemFrame,self.Tipov,"noticia","documento","evento","reflexion")
-        self.Tipo.grid(row=14,column=0,sticky=W)
+        self.Tipo=OptionMenu(downFrame,self.Tipov,"noticia","documento","evento","reflexion")
+        self.Tipo.grid(row=0,column=2,sticky=E)
+        downFrame.grid(row=14,column=0,sticky=W+E)
 
-        self.butFrame = Frame(self.editItemFrame, width=100, height=585);
+        self.butFrame = Frame(self.editItemFrame, width=100, height=585)
         self.ButNew=Button(self.butFrame,text="Nuevo")
         self.ButNew.configure(command=self.newItem)
         self.ButNew.grid(row=0,column=0)
@@ -162,21 +198,49 @@ class Interfaz(Frame):
         self.butFrame.grid(row=0,column=1)
         self.listframe.grid(row=0,column=2)
 
+    def trata_link(self):
+        e=self.Var_linklink.get()
+        if (e):
+            # linklink activado
+            self.LinkEN.configure(state=DISABLED)
+        else:
+            # linklink desactivado
+            self.LinkEN.configure(state=NORMAL)
+
+
+    def update_tag(self,e):
+        x=re.match('(.+)\:.+$',e,re.M|re.I)
+        t=x.group(1)
+        d=self.Tagsv.get()
+        if len(d)==0:
+            self.Tagsv.set(t)
+        else:
+            self.Tagsv.set(d+","+t)
 
     def puebla_item(self,itemEN,itemES,num):
         #LabelNum contiene el num del elemento cargado
+        linkes=itemES.find('link').text
+        linken=itemEN.find('link').text
+
+        if (linkes==linken):
+            self.Var_linklink.set(1)
+            self.LinkEN.configure(state=DISABLED)
+        else:
+            self.Var_linklink.set(0)
+            self.LinkEN.configure(state=NORMAL)
+
         self.LabelNum=num
         self.TitENv.set(itemEN.find('titulo').text)
         self.TextEN.delete("1.0",END)
         self.TextEN.insert(END,itemEN.find('texto').text)
-        self.LinkENv.set(itemEN.find('link').text)
+        self.LinkENv.set(linken)
         self.Tagsv.set(itemEN.find('tag').text)
         self.Tipov.set(itemEN.find('tipo').text)
 
         self.TitESv.set(itemES.find('titulo').text)
         self.TextES.delete("1.0",END)
         self.TextES.insert(END,itemES.find('texto').text)
-        self.LinkESv.set(itemES.find('link').text)
+        self.LinkESv.set(linkes)
 
     def BorraEditUI(self):
         """
@@ -191,6 +255,8 @@ class Interfaz(Frame):
         self.LinkENv.set("")
         self.Tipov.set("noticia")
         self.Tagsv.set("")
+        self.Var_linklink.set(1)
+        self.LinkEN.configure(state=DISABLED)
 
 
     def ArchivoNuevo(self):
@@ -286,6 +352,7 @@ class Interfaz(Frame):
         for a in archs:
             e=re.match('.*\/(.*)\-en\.xml',a,re.M|re.I)
             l.append(e.group(1))
+        l.sort(key=self.natural_keys)
         return l
 
     def AbrirBoletin(self,nombre):
@@ -328,10 +395,11 @@ class Interfaz(Frame):
             else:
                 refl.append({'titulo':titulo,'pos':pos})
 
-        self.noticias=[i['titulo'] for i in sorted(noti,key=lambda k: k['pos'])]
-        self.documentos=[i['titulo'] for i in sorted(docu,key=lambda k: k['pos'])]
-        self.eventos=[i['titulo'] for i in sorted(even,key=lambda k: k['pos'])]
-        self.reflexiones=[i['titulo'] for i in sorted(refl,key=lambda k: k['pos'])]
+        # OjO. Si se asignan las listas, la MyListBox pierde su referencia a elementos
+        self.noticias.extend([i['titulo'] for i in sorted(noti,key=lambda k: k['pos'])])
+        self.documentos.extend([i['titulo'] for i in sorted(docu,key=lambda k: k['pos'])])
+        self.eventos.extend([i['titulo'] for i in sorted(even,key=lambda k: k['pos'])])
+        self.reflexiones.extend([i['titulo'] for i in sorted(refl,key=lambda k: k['pos'])])
 
     def newItem(self):
         """
@@ -348,7 +416,10 @@ class Interfaz(Frame):
         """
         titulo=self.TitENv.get()
         texto=self.TextEN.get("1.0",END)
-        link=self.LinkENv.get()
+        if self.Var_linklink.get():
+            link=self.LinkESv.get()
+        else:
+            link=self.LinkENv.get()
         tag=self.Tagsv.get()
         tipo=self.Tipov.get()
 
@@ -473,12 +544,46 @@ class Interfaz(Frame):
         item=self.core.item(titulo)
         self.puebla_item(item[0],item[1],item[2])
 
-<<<<<<< HEAD
-    def funciondeprueba(self):
-        """
-        Esto es posterior a la version 1
-        """
-=======
+    def ren_tag(self):
+        self.borra()
+        self.parent.geometry("300x300")
+        self.ren_tagFrame=Frame(self,width=300,height=300)
+
+        lista_tags=sorted(self.core.tags.keys(),key=lambda s: s.lower())
+
+        L1=Label(self.ren_tagFrame,text="Tag vieja")
+        self.tag_vieja_var = StringVar()
+        self.tag_vieja_var.set(lista_tags[0])
+        self.tag_vieja_optionmenu=OptionMenu(self.ren_tagFrame,self.tag_vieja_var,*lista_tags)
+        self.tag_vieja_optionmenu.configure(width=30)
+        L2=Label(self.ren_tagFrame,text="Tag nueva")
+        self.tag_nueva_var=StringVar()
+        self.tag_nueva_entry=Entry(self.ren_tagFrame,textvariable=self.tag_nueva_var)
+        self.tag_nueva_ok=Button(self.ren_tagFrame,text="OK",command=self.do_ren_tag)
+
+        L1.grid(row=0)
+        self.tag_vieja_optionmenu.grid(row=1)
+        L2.grid(row=2)
+        self.tag_nueva_entry.grid(row=3)
+        self.tag_nueva_ok.grid(row=4)
+        self.ren_tagFrame.grid(row=0)
+        self.FrameActiva=self.ren_tagFrame
+
+    def do_ren_tag(self):
+        if self.tag_nueva_var.get():
+            n=self.core.ren_tag(self.tag_vieja_var.get(),self.tag_nueva_var.get())
+            lista_tags=sorted(self.core.tags.keys(),key=lambda s: s.lower())
+            m = self.tag_vieja_optionmenu.children['menu']
+            m.delete(0,END)
+            for val in lista_tags:
+                m.add_command(label=val,command=lambda v=self.tag_vieja_var,l=val:v.set(l))
+                self.tag_vieja_var.set(lista_tags[0])
+            self.tag_nueva_var.set('')
+        else:
+            # Si nueva es vacía podríamos borrar
+            pass
+
+>>>>>>> Desarrollo
     def HerrCopiara(self):
         self.borra()
         altura=650
@@ -496,23 +601,23 @@ class Interfaz(Frame):
         for item in self.noticias:
             self.ListBoxNoticias.insert(END, item)
 
-        L2=Label(itemsFrame,text="Eventos")
-        L2.grid(row=2,column=0,sticky=W)
-        scrollbar2=Scrollbar(itemsFrame)
-        scrollbar2.grid(row=3,column=1,sticky=N+S)
-        self.ListBoxEventos=Listbox(itemsFrame,yscrollcommand=scrollbar2.set,selectmode=MULTIPLE,exportselection=False)
-        self.ListBoxEventos.grid(row=3,column=0)
-        for item in self.eventos:
-            self.ListBoxEventos.insert(END, item)
-
         L3=Label(itemsFrame,text="Documentos")
-        L3.grid(row=4,column=0,sticky=W)
+        L3.grid(row=2,column=0,sticky=W)
         scrollbar3=Scrollbar(itemsFrame)
-        scrollbar3.grid(row=5,column=1,sticky=N+S)
+        scrollbar3.grid(row=3,column=1,sticky=N+S)
         self.ListBoxDocumentos=Listbox(itemsFrame,yscrollcommand=scrollbar3.set,selectmode=MULTIPLE,height=5,exportselection=False)
-        self.ListBoxDocumentos.grid(row=5,column=0)
+        self.ListBoxDocumentos.grid(row=3,column=0)
         for item in self.eventos:
             self.ListBoxDocumentos.insert(END, item)
+
+        L2=Label(itemsFrame,text="Eventos")
+        L2.grid(row=4,column=0,sticky=W)
+        scrollbar2=Scrollbar(itemsFrame)
+        scrollbar2.grid(row=5,column=1,sticky=N+S)
+        self.ListBoxEventos=Listbox(itemsFrame,yscrollcommand=scrollbar2.set,selectmode=MULTIPLE,exportselection=False)
+        self.ListBoxEventos.grid(row=5,column=0)
+        for item in self.eventos:
+            self.ListBoxEventos.insert(END, item)
 
         L4=Label(itemsFrame,text="Reflexiones")
         L4.grid(row=6,column=0,sticky=W)
@@ -601,6 +706,16 @@ class Interfaz(Frame):
         self.ListBoxEve.fill(self.eventos)
         self.ListBoxRef.fill(self.reflexiones)
 
+    def atoi(self,text):
+        return int(text) if text.isdigit() else text
+
+    def natural_keys(self,text):
+        '''
+        alist.sort(key=natural_keys) sorts in human order
+        http://nedbatchelder.com/blog/200712/human_sorting.html
+        (See Toothy's implementation in the comments)
+        '''
+        return [ self.atoi(c) for c in re.split('(\d+)', text) ]
 
     def DoTerminar(self):
 >>>>>>> Desarrollo

@@ -583,7 +583,6 @@ class Interfaz(Frame):
             # Si nueva es vacía podríamos borrar
             pass
 
->>>>>>> Desarrollo
     def HerrCopiara(self):
         self.borra()
         altura=650
@@ -718,5 +717,4 @@ class Interfaz(Frame):
         return [ self.atoi(c) for c in re.split('(\d+)', text) ]
 
     def DoTerminar(self):
->>>>>>> Desarrollo
         pass

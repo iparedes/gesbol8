@@ -632,10 +632,6 @@ class Interfaz(Frame):
         ButSend.grid(row=0,column=0)
         ButSend.configure(command=self.DoCopiara)
 
-        # ButTerminar=Button(BotonFrame,text="Terminar")
-        # ButTerminar.grid(row=1,column=0)
-        # ButTerminar.configure(command=self.DoTerminar)
-
         ArchFrame=Frame(CopiarFrame,width=400,height=altura)
 
         scrollbar5=Scrollbar(ArchFrame)

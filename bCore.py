@@ -115,7 +115,7 @@ class bCore:
         else: # tipo=='reflexion'
             pos=self.posRef
             self.posRef+=1
-            en.find('titulo').text="Reflexion "+str(pos)
+            en.find('titulo').text="Reflexion "+str(self.posRef)
 
         posi=es.findtext('pos')
         if (posi==None):
@@ -195,17 +195,17 @@ class bCore:
 
         tipo=itemEN['tipo']
         if tipo=='noticia':
-            pos=self.posNot
-            self.posNot+=1
+            pos=self.posNot+1
+            #self.posNot+=1
         elif tipo=='documento':
-            pos=self.posDoc
-            self.posDoc+=1
+            pos=self.posDoc+1
+            #self.posDoc+=1
         elif tipo=='evento':
-            pos=self.posEve
-            self.posEve+=1
+            pos=self.posEve+1
+            #self.posEve+=1
         else: # tipo=='reflexion'
-            pos=self.posRef
-            self.posRef+=1
+            pos=self.posRef+1
+            #self.posRef+=1
 
         elementoEN=etree.Element("item")
         ident=etree.SubElement(elementoEN,"titulo")

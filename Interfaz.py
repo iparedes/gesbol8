@@ -328,13 +328,21 @@ class Interfaz(Frame):
         l=self.ListaArchivos()
         for i in l:
             self.ListBoxAbrirArchivo.insert(END,i)
+        self.ListBoxAbrirArchivo.bind("<Double-Button-1>", self.DoAbrirBoletin)
 
         self.ButOKAbrirArchivo=Button(self.ArchivoAbrirFrame,text="Abrir")
         self.ButOKAbrirArchivo.configure(command=lambda: self.AbrirBoletin(l[int(self.ListBoxAbrirArchivo.curselection()[0])]))
+        
         self.ButOKAbrirArchivo.grid(row=0,column=2)
 
         self.ArchivoAbrirFrame.grid()
         self.HerrMenu.entryconfigure(0,state='normal')
+
+    def DoAbrirBoletin(self,e):
+        index = self.ListBoxAbrirArchivo.curselection()[0]
+        l=self.ListBoxAbrirArchivo.get(index)
+        self.AbrirBoletin(l)
+        pass
 
     def HideListaArchivos(self):
         """
@@ -414,6 +422,7 @@ class Interfaz(Frame):
         Callback del botón OK item.
         Actualiza el item en el XML a partir de los valores en los widgets
         """
+
         titulo=self.TitENv.get()
         texto=self.TextEN.get("1.0",END)
         if self.Var_linklink.get():
@@ -460,6 +469,7 @@ class Interfaz(Frame):
         Sale de la edición de items y actualiza los archivos XML
         """
         pos=self.setPosiciones()
+
         # self.itemFrame.forget()
         # self.butFrame.forget()
         # self.listframe.forget()

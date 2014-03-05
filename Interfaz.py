@@ -616,7 +616,7 @@ class Interfaz(Frame):
         scrollbar3.grid(row=3,column=1,sticky=N+S)
         self.ListBoxDocumentos=Listbox(itemsFrame,yscrollcommand=scrollbar3.set,selectmode=MULTIPLE,height=5,exportselection=False)
         self.ListBoxDocumentos.grid(row=3,column=0)
-        for item in self.eventos:
+        for item in self.documentos:
             self.ListBoxDocumentos.insert(END, item)
 
         L2=Label(itemsFrame,text="Eventos")
